@@ -1,0 +1,1 @@
+pub const LIBCURL_IMPERSONATE_VERSION: &str = "1.5.6";
