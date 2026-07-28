@@ -11,6 +11,13 @@ homepage = "https://github.com/ajsb85/impersonate-rs"
 keywords = ["curl", "impersonate", "browser", "fingerprint", "tls"]
 categories = ["web-programming::http-client", "network-programming"]
 
+[workspace]
+members = [
+    ".",
+    "xtask",
+    "crates/build-support",
+]
+
 [package.metadata.docs.rs]
 features = ["mock"]
 rustc-args = ["--cfg", "docsrs"]
@@ -41,3 +48,6 @@ mock = []
 [dependencies.clap]
 version = "4.0"
 features = ["derive"]
+
+[build-dependencies]
+build-support = { path = "crates/build-support" }

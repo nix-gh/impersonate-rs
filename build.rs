@@ -10,5 +10,10 @@ fn main() {
         // curl-sys usually links "curl". If we link "curl-impersonate-chrome" too, it might work
         // if the symbols don't conflict or if we prefer the latter.
         // However, curl-impersonate usually REPLACES curl.
+
+        println!(
+            "cargo:warning=Expecting libcurl-impersonate v{}",
+            build_support::LIBCURL_IMPERSONATE_VERSION
+        );
     }
 }

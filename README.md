@@ -25,14 +25,29 @@ impersonate-rs = "0.1.0"
 
 ### System Requirements
 
-This crate links against `libcurl-impersonate`. You must have the shared library installed on your system.
+This crate links against `libcurl-impersonate`. You must either have a supported version installed on your system or install it locally using the installer.
 
-**Linux (Debian/Ubuntu):**
+#### Linux (Debian/Ubuntu):
 ```bash
 # Example for installing curl-impersonate-chrome
 sudo apt install build-essential pkg-config cmake ninja-build curl autoconf automake libtool
 # Follow build instructions from https://github.com/lexiforest/curl-impersonate
 ```
+
+#### libcurl-impersonate installer
+
+The installer downloads the version currently supported by impersonate-rs.
+
+```bash
+cargo run -p xtask -- install-libcurl
+```
+
+The installer:
+
+- uses a compatible system installation when available;
+- reuses an existing local installation when available;
+- otherwise downloads and installs the supported version.
+
 
 **Development Mode:**
 If you don't have the library installed yet, you can build with the `mock` feature to stub the FFI calls:
