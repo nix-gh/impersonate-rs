@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -21,9 +21,15 @@ fn main() -> Result<()> {
 }
 
 fn install_libcurl() -> Result<()> {
+    let target =
+        build_support::LibcurlTarget::detect_host().context("unsupported host platform")?;
+
     println!(
         "Installing libcurl-impersonate v{}...",
         build_support::LIBCURL_IMPERSONATE_VERSION
     );
+    println!("Target: {}", target.release_target());
+    println!("Download: {}", target.download_url());
+
     Ok(())
 }
