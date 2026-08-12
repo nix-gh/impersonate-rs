@@ -30,13 +30,20 @@ impl LibcurlTarget {
         }
     }
 
-    pub fn download_url(self) -> String {
+    pub fn archive_name(self) -> String {
         format!(
-            "{}/v{}/libcurl-impersonate-v{}.{}.tar.gz",
-            LIBCURL_IMPERSONATE_RELEASE_URL,
-            LIBCURL_IMPERSONATE_VERSION,
+            "libcurl-impersonate-v{}.{}.tar.gz",
             LIBCURL_IMPERSONATE_VERSION,
             self.release_target(),
+        )
+    }
+
+    pub fn download_url(self) -> String {
+        format!(
+            "{}/v{}/{}",
+            LIBCURL_IMPERSONATE_RELEASE_URL,
+            LIBCURL_IMPERSONATE_VERSION,
+            self.archive_name(),
         )
     }
 }
@@ -49,6 +56,11 @@ pub fn cache_directory() -> Option<PathBuf> {
             .join("libcurl-impersonate")
             .join(LIBCURL_IMPERSONATE_VERSION)
     })
+}
+
+pub fn cache_archive_path(target: LibcurlTarget) -> Option<PathBuf> {
+    let cache_directory = cache_directory()?;
+    Some(cache_directory.join(target.archive_name()))
 }
 
 pub fn find_library() -> Option<PathBuf> {
