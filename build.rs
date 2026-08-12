@@ -4,8 +4,8 @@ fn main() {
     {
         println!("cargo:rerun-if-env-changed=LIBCURL_IMPERSONATE_DIR");
 
-        let library_directory = build_support::find_library()
-            .expect("libcurl-impersonate-chrome was not found");
+        let library_directory =
+            build_support::find_library().expect("libcurl-impersonate-chrome was not found");
 
         println!(
             "cargo:rustc-link-search=native={}",
