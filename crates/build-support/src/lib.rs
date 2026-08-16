@@ -48,18 +48,19 @@ impl LibcurlTarget {
     }
 }
 
-pub fn cache_directory() -> Option<PathBuf> {
+pub fn cache_directory(target: LibcurlTarget) -> Option<PathBuf> {
     env::var_os("HOME").map(|home_directory| {
         PathBuf::from(home_directory)
             .join(".cache")
             .join("impersonate-rs")
             .join("libcurl-impersonate")
+            .join(target.release_target())
             .join(LIBCURL_IMPERSONATE_VERSION)
     })
 }
 
 pub fn cache_archive_path(target: LibcurlTarget) -> Option<PathBuf> {
-    let cache_directory = cache_directory()?;
+    let cache_directory = cache_directory(target)?;
     Some(cache_directory.join(target.archive_name()))
 }
 
@@ -76,7 +77,7 @@ fn find_from_environment() -> Option<PathBuf> {
 }
 
 fn find_from_cache() -> Option<PathBuf> {
-    let path = cache_directory()?;
+    let path = cache_directory(LibcurlTarget::detect_host()?)?;
     contains_library(&path).then_some(path)
 }
 
@@ -90,6 +91,6 @@ fn find_system_library() -> Option<PathBuf> {
     }
 }
 
-fn contains_library(directory: &Path) -> bool {
-    directory.join("libcurl-impersonate-chrome.so").exists()
+pub fn contains_library(directory: &Path) -> bool {
+    directory.join("libcurl-impersonate.so").exists()
 }
