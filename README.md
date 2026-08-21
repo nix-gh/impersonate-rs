@@ -22,35 +22,47 @@ Add this to your `Cargo.toml`:
 [dependencies]
 impersonate-rs = "0.1.0"
 ```
-
 ### System Requirements
 
-This crate links against `libcurl-impersonate`. You must either have a supported version installed on your system or install it locally using the installer.
+This crate uses `libcurl-impersonate`. The supported version is currently `1.5.6`.
 
-#### Linux (Debian/Ubuntu):
-```bash
-# Example for installing curl-impersonate
-sudo apt install build-essential pkg-config cmake ninja-build curl autoconf automake libtool
-# Follow build instructions from https://github.com/lexiforest/curl-impersonate
-```
+On Linux, `impersonate-rs` automatically downloads and caches the supported prebuilt `libcurl-impersonate` release when it is not already available.
 
-#### libcurl-impersonate installer
+#### Linux
 
-The installer downloads the version currently supported by impersonate-rs.
+The build requires the following system tools:
 
 ```bash
-cargo run -p xtask -- install-libcurl
+sudo apt install curl tar pkg-config
+````
+
+Configure `pkg-config` to use the `libcurl.pc` provided by `impersonate-rs`.
+
+Create `.cargo/config.toml` in your project:
+
+```toml
+[env]
+PKG_CONFIG_PATH = { value = "/path/to/impersonate-rs/native", force = true }
 ```
 
-The installer:
+Replace `/path/to/impersonate-rs` with the path to the `impersonate-rs` checkout.
 
-- uses a compatible system installation when available;
-- reuses an existing local installation when available;
-- otherwise downloads and installs the supported version.
+The `libcurl-impersonate` library itself is downloaded automatically during the build and cached locally. No manual installation of `libcurl-impersonate` is required.
 
+The intended workflow is therefore:
 
-**Development Mode:**
-If you don't have the library installed yet, you can build with the `mock` feature to stub the FFI calls:
+```bash
+cargo add impersonate-rs
+cargo build
+cargo run
+```
+
+The first build downloads the supported `libcurl-impersonate` release if necessary. Subsequent builds reuse the cached copy.
+
+#### Development Mode
+
+If you don't need the native library, you can build with the `mock` feature to stub the FFI calls:
+
 ```toml
 [dependencies]
 impersonate-rs = { version = "0.1.0", features = ["mock"] }
