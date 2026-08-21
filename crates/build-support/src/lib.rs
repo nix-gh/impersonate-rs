@@ -5,6 +5,8 @@ use std::{
 };
 
 pub const LIBCURL_IMPERSONATE_VERSION: &str = "1.5.6";
+const RUNTIME_LIBRARY_NAME: &str = "libcurl-impersonate.so.4";
+const LINK_LIBRARY_NAME: &str = "libcurl-impersonate.so";
 pub const LIBCURL_IMPERSONATE_RELEASE_URL: &str =
     "https://github.com/lexiforest/curl-impersonate/releases/download";
 
@@ -71,29 +73,29 @@ pub fn find_library() -> Option<PathBuf> {
         .or_else(find_system_library)
 }
 
+pub fn contains_compatible_library(directory: &Path) -> bool {
+    directory.join(LINK_LIBRARY_NAME).exists() && directory.join(RUNTIME_LIBRARY_NAME).exists() 
+}
+
 fn find_from_environment() -> Option<PathBuf> {
     let directory = std::env::var_os("LIBCURL_IMPERSONATE_DIR")?;
     let path = PathBuf::from(directory);
-    contains_library(&path).then_some(path)
+    contains_compatible_library(&path).then_some(path)
 }
 
 fn find_from_cache() -> Option<PathBuf> {
     let path = cache_directory(LibcurlTarget::detect_host()?)?;
-    contains_library(&path).then_some(path)
+    contains_compatible_library(&path).then_some(path)
 }
 
 fn find_system_library() -> Option<PathBuf> {
     let path: PathBuf = PathBuf::from("/usr/local/lib");
 
-    if contains_library(&path) {
+    if contains_compatible_library(&path) {
         Some(path)
     } else {
         None
     }
-}
-
-pub fn contains_library(directory: &Path) -> bool {
-    directory.join("libcurl-impersonate.so").exists()
 }
 
 fn install_libcurl() -> Result<std::path::PathBuf, String> {
@@ -109,7 +111,7 @@ fn install_libcurl() -> Result<std::path::PathBuf, String> {
     fs::create_dir_all(&cache_directory)
         .map_err(|error| format!("failed to create cache directory: {error}"))?;
 
-    if !contains_library(&cache_directory) {
+    if !contains_compatible_library(&cache_directory) {
         download_archive(target.download_url().as_str(), &archive_path)?;
         extract_archive(&archive_path, &cache_directory)?;
     }
@@ -157,7 +159,7 @@ fn extract_archive(archive_path: &Path, destination: &Path) -> Result<(), String
         return Err(format!("tar failed with status {status}"));
     }
 
-    if !contains_library(destination) {
+    if !contains_compatible_library(destination) {
         return Err(format!(
             "libcurl-impersonate was extracted but the expected library was not found in {}",
             destination.display()
