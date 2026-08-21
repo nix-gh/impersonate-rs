@@ -32,6 +32,7 @@ serde_json = "1.0"
 log = "0.4"
 anyhow = "1.0"
 serde_urlencoded = "0.7.1"
+build-support = { path = "crates/build-support" }
 
 [dev-dependencies]
 tokio-test = "0.4"

@@ -13,13 +13,18 @@ fn prepare_link_library(library_directory: &std::path::Path) {
 fn prepare_runtime_library(library_directory: &std::path::Path) {
     let target_directory =
         build_support::target_directory().expect("failed to determine Cargo target directory");
-
-    let runtime_library = target_directory.join("libcurl-impersonate.so.4");
+    let target = build_support::LibcurlTarget::detect_host().expect("unsupported host platform");
+    let runtime_library = target_directory.join(build_support::runtime_library_name(target));
     fs::copy(
-        library_directory.join("libcurl-impersonate.so.4"),
+        library_directory.join(build_support::runtime_library_name(target)),
         &runtime_library,
     )
     .expect("failed to copy libcurl-impersonate runtime library");
+
+    target
+    .set_impersonate_runtime_library_path(&runtime_library)
+    .expect("failed to configure runtime library path");
+
     println!("cargo:rustc-link-arg=-Wl,-rpath,$ORIGIN");
 }
 

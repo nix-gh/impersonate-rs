@@ -299,6 +299,9 @@ impl RequestBuilder {
     fn send_with_easy(self, easy: &mut Easy) -> Result<Response> {
         // Basic options
         easy.url(&self.url)?;
+        if let Some(ca_bundle) = build_support::android_ca_bundle() {
+            easy.cainfo(ca_bundle)?;
+        }
         easy.ssl_verify_peer(self.verify)?;
         easy.ssl_verify_host(self.verify)?;
         easy.follow_location(self.follow_redirects)?;
