@@ -1,0 +1,6 @@
+Name: libcurl
+URL: https://github.com/lexiforest/curl-impersonate
+Description: libcurl impersonate build
+Version: 1.5.6
+Libs: -lcurl-impersonate
+Cflags:
