@@ -31,7 +31,7 @@ This crate uses `libcurl-impersonate`. The supported version is currently `1.5.6
 
 On Linux, `impersonate-rs` automatically downloads and caches the supported prebuilt `libcurl-impersonate` release when it is not already available.
 
-#### Automatic install
+##### Automatic install
 The automatic build requires the following system tools:
 
 ```bash
@@ -51,21 +51,42 @@ Replace `/path/to/impersonate-rs` with the path to the `impersonate-rs` checkout
 
 The `libcurl-impersonate` library itself is downloaded automatically during the build and cached locally. No manual installation of `libcurl-impersonate` is required.
 
-The intended workflow is therefore:
-
-```bash
-cargo add impersonate-rs
-cargo build
-cargo run
-```
-
 The first build downloads the supported `libcurl-impersonate` release if necessary. Subsequent builds reuse the cached copy.
 
-#### Manual install
+##### Manual install
 ```
 sudo apt install build-essential pkg-config cmake ninja-build curl autoconf automake libtool
 # Follow build instructions from https://github.com/lexiforest/curl-impersonate
 ```
+
+#### Android (Termux)
+
+`impersonate-rs` currently supports Android through Termux on `aarch64`.
+
+Install the required build tools and CA certificates:
+
+```bash
+pkg update
+pkg install curl tar pkg-config make ca-certificates patchelf
+````
+
+The `libcurl-impersonate` Android library is downloaded automatically during the build and cached locally.
+
+Configure `pkg-config` to use the `libcurl.pc` provided by `impersonate-rs`.
+
+Create `.cargo/config.toml` in your project:
+
+```toml
+[env]
+
+PKG_CONFIG_PATH = { value = "/path/to/impersonate-rs/native", force = true }
+```
+
+Replace `/path/to/impersonate-rs` with the path to the `impersonate-rs` checkout.
+
+The build automatically configures libcurl to use Termux's CA bundle:
+
+The first build downloads the supported `libcurl-impersonate` Android release if necessary. Subsequent builds reuse the cached copy.
 
 #### Development Mode
 
