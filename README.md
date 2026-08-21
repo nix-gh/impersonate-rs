@@ -29,7 +29,7 @@ This crate links against `libcurl-impersonate`. You must either have a supported
 
 #### Linux (Debian/Ubuntu):
 ```bash
-# Example for installing curl-impersonate-chrome
+# Example for installing curl-impersonate
 sudo apt install build-essential pkg-config cmake ninja-build curl autoconf automake libtool
 # Follow build instructions from https://github.com/lexiforest/curl-impersonate
 ```
