@@ -1,6 +1,5 @@
 use std::{
-    fs,
-    env,
+    env, fs,
     path::{Path, PathBuf},
     process::Command,
 };
@@ -174,4 +173,13 @@ pub fn find_or_install_library() -> Result<std::path::PathBuf, String> {
     }
 
     install_libcurl()
+}
+
+pub fn target_directory() -> Option<PathBuf> {
+    let out_dir = PathBuf::from(env::var_os("OUT_DIR")?);
+
+    out_dir
+        .ancestors()
+        .nth(3)
+        .map(Path::to_path_buf)
 }
