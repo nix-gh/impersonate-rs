@@ -26,11 +26,13 @@ impersonate-rs = "0.1.0"
 
 This crate uses `libcurl-impersonate`. The supported version is currently `1.5.6`.
 
+
+#### Linux (Debian/Ubuntu):
+
 On Linux, `impersonate-rs` automatically downloads and caches the supported prebuilt `libcurl-impersonate` release when it is not already available.
 
-#### Linux
-
-The build requires the following system tools:
+#### Automatic install
+The automatic build requires the following system tools:
 
 ```bash
 sudo apt install curl tar pkg-config
@@ -58,6 +60,12 @@ cargo run
 ```
 
 The first build downloads the supported `libcurl-impersonate` release if necessary. Subsequent builds reuse the cached copy.
+
+#### Manual install
+```
+sudo apt install build-essential pkg-config cmake ninja-build curl autoconf automake libtool
+# Follow build instructions from https://github.com/lexiforest/curl-impersonate
+```
 
 #### Development Mode
 
