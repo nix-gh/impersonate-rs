@@ -1,5 +1,27 @@
-
 use std::fs;
+
+#[cfg(not(feature = "mock"))]
+fn prepare_link_library(library_directory: &std::path::Path) {
+    println!(
+        "cargo:rustc-link-search=native={}",
+        library_directory.display()
+    );
+    println!("cargo:rustc-link-lib=curl-impersonate");
+}
+
+#[cfg(not(feature = "mock"))]
+fn prepare_runtime_library(library_directory: &std::path::Path) {
+    let target_directory =
+        build_support::target_directory().expect("failed to determine Cargo target directory");
+
+    let runtime_library = target_directory.join("libcurl-impersonate.so.4");
+    fs::copy(
+        library_directory.join("libcurl-impersonate.so.4"),
+        &runtime_library,
+    )
+    .expect("failed to copy libcurl-impersonate runtime library");
+    println!("cargo:rustc-link-arg=-Wl,-rpath,$ORIGIN");
+}
 
 fn main() {
     #[cfg(not(feature = "mock"))]
@@ -9,23 +31,7 @@ fn main() {
         let library_directory = build_support::find_or_install_library()
             .expect("failed to install libcurl-impersonate");
 
-        println!(
-            "cargo:rustc-link-search=native={}",
-            library_directory.display()
-        );
-
-        let target_directory =
-            build_support::target_directory().expect("failed to determine Cargo target directory");
-
-        let runtime_library = target_directory.join("libcurl-impersonate.so.4");
-
-        fs::copy(
-            library_directory.join("libcurl-impersonate.so.4"),
-            &runtime_library,
-        )
-        .expect("failed to copy libcurl-impersonate runtime library");
-
-        println!("cargo:rustc-link-lib=curl-impersonate");
-        println!("cargo:rustc-link-arg=-Wl,-rpath,$ORIGIN");
+        prepare_link_library(&library_directory);
+        prepare_runtime_library(&library_directory);
     }
 }

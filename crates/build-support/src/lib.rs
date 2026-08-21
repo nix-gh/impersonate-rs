@@ -178,8 +178,5 @@ pub fn find_or_install_library() -> Result<std::path::PathBuf, String> {
 pub fn target_directory() -> Option<PathBuf> {
     let out_dir = PathBuf::from(env::var_os("OUT_DIR")?);
 
-    out_dir
-        .ancestors()
-        .nth(3)
-        .map(Path::to_path_buf)
+    out_dir.ancestors().nth(3).map(Path::to_path_buf)
 }
