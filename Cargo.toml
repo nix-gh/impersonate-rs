@@ -14,7 +14,6 @@ categories = ["web-programming::http-client", "network-programming"]
 [workspace]
 members = [
     ".",
-    "xtask",
     "crates/build-support",
 ]
 

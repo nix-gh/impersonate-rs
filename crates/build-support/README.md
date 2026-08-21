@@ -2,10 +2,7 @@
 
 Internal utilities shared by the workspace build tooling.
 
-This crate contains logic used by both:
-
-- the root `build.rs`, which verifies that a compatible `libcurl-impersonate` installation is available;
-- the `xtask`, which installs and manages `libcurl-impersonate`.
+This crate contains logic used by the root `build.rs`, which verifies that a compatible `libcurl-impersonate` installation is available;
 
 Keeping this logic in a dedicated crate ensures there is a single implementation for:
 

@@ -1,6 +1,8 @@
 use std::{
+    fs,
     env,
     path::{Path, PathBuf},
+    process::Command,
 };
 
 pub const LIBCURL_IMPERSONATE_VERSION: &str = "1.5.6";
@@ -93,4 +95,83 @@ fn find_system_library() -> Option<PathBuf> {
 
 pub fn contains_library(directory: &Path) -> bool {
     directory.join("libcurl-impersonate.so").exists()
+}
+
+fn install_libcurl() -> Result<std::path::PathBuf, String> {
+    let target =
+        LibcurlTarget::detect_host().ok_or_else(|| "unsupported host platform".to_owned())?;
+
+    let cache_directory =
+        cache_directory(target).ok_or_else(|| "HOME environment variable is not set".to_owned())?;
+
+    let archive_path = cache_archive_path(target)
+        .ok_or_else(|| "HOME environment variable is not set".to_owned())?;
+
+    fs::create_dir_all(&cache_directory)
+        .map_err(|error| format!("failed to create cache directory: {error}"))?;
+
+    if !contains_library(&cache_directory) {
+        download_archive(target.download_url().as_str(), &archive_path)?;
+        extract_archive(&archive_path, &cache_directory)?;
+    }
+
+    Ok(cache_directory)
+}
+
+fn download_archive(download_url: &str, archive_path: &Path) -> Result<(), String> {
+    if archive_path.exists() {
+        return Ok(());
+    }
+
+    let temporary_path = archive_path.with_extension("download");
+
+    let status = Command::new("curl")
+        .args(["--fail", "--location", "--silent", "--show-error"])
+        .arg("--output")
+        .arg(&temporary_path)
+        .arg(download_url)
+        .status()
+        .map_err(|error| format!("failed to execute curl: {error}"))?;
+
+    if !status.success() {
+        let _ = fs::remove_file(&temporary_path);
+        return Err(format!("curl failed with status {status}"));
+    }
+
+    fs::rename(&temporary_path, archive_path)
+        .map_err(|error| format!("failed to store downloaded archive: {error}"))?;
+
+    Ok(())
+}
+
+fn extract_archive(archive_path: &Path, destination: &Path) -> Result<(), String> {
+    let status = Command::new("tar")
+        .args(["--extract", "--gzip"])
+        .arg("--file")
+        .arg(archive_path)
+        .arg("--directory")
+        .arg(destination)
+        .status()
+        .map_err(|error| format!("failed to execute tar: {error}"))?;
+
+    if !status.success() {
+        return Err(format!("tar failed with status {status}"));
+    }
+
+    if !contains_library(destination) {
+        return Err(format!(
+            "libcurl-impersonate was extracted but the expected library was not found in {}",
+            destination.display()
+        ));
+    }
+
+    Ok(())
+}
+
+pub fn find_or_install_library() -> Result<std::path::PathBuf, String> {
+    if let Some(library_directory) = find_library() {
+        return Ok(library_directory);
+    }
+
+    install_libcurl()
 }
