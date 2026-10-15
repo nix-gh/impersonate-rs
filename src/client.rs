@@ -456,6 +456,11 @@ impl Session {
     pub fn request(&self, method: &str, url: &str) -> RequestBuilder {
         self.client.request(method, url)
     }
+
+    /// Executes a prepared [`RequestBuilder`] using this session.
+    pub fn execute(&self, request: RequestBuilder) -> Result<Response> {
+        request.send_with_easy(&mut self.easy.borrow_mut())
+    }
 }
 
 impl Default for Session {
